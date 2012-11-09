@@ -1,0 +1,19 @@
+{
+  "name": "nko3-nodo-baggins",
+  "version": "0.0.0",
+  "description": "nodo baggins",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:nko3/nodo-baggins.git"
+  },
+  "dependencies": {
+  },
+  "engines": {
+    "node": "0.8.x"
+  },
+  "subdomain": "nodo-baggins.nko3"
+}

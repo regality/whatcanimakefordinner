@@ -1,0 +1,17 @@
+form(action='/add', method='post').form-horizontal
+
+  .name
+    input#name(name='name', type='text', placeholder='Name')
+  .description
+    input#description(name='description', type='text', placeholder='Description')
+  .ingredients
+    input#ingredient(name='ingredients', type='text', placeholder='Ingredient')
+  .instructions
+    input#instruction(name='instruction', type='text', placeholder='Instruction')
+
+    .form-actions
+      button(type='submit').btn.btn-primary
+        i.icon-ok Create
+      &nbsp;
+      a.btn.btn-warning(href='/') 
+        i.icon-ban-cirle Cancel

@@ -1,11 +1,15 @@
-form(action='/add', method='post').form-horizontal
+script(src='js/addRecipe.js')
+
+form(action='/add', method='post')
 
   .name
     input#name(name='name', type='text', placeholder='Name')
   .description
-    input#description(name='description', type='text', placeholder='Description')
+    textarea.input-xlarge(rows=3, name='description', placeholder='Description')
   .ingredients
-    input#ingredient(name='ingredients', type='text', placeholder='Ingredient')
+    input#ingredient(name='amount', type='text', placeholder='Amount')
+    input#ingredient(name='measure', type='text', placeholder='Measure')
+    input#ingredient(name='ingredient', type='text', placeholder='Ingredient')
   .instructions
     input#instruction(name='instruction', type='text', placeholder='Instruction')
 

@@ -1,13 +1,24 @@
 {
   "name": "application-name",
-  "version": "0.0.1",
+  "version": "0.0.1-1",
   "private": true,
   "scripts": {
-    "start": "node app"
+    "start": "app.js"
   },
   "dependencies": {
     "express": "3.0.0rc4",
     "jade": "*",
-    "express-conductor": "0.0.1-4"
+    "express-conductor": "0.0.1-4",
+    "mongoose": "~3.3.1",
+    "winston": "~0.6.2",
+    "confrodo": "0.0.5"
+  },
+  "subdomain": "nko3-nodo-baggins.nodo-baggins",
+  "domains": [
+    "whatcanimakefordinnerwiththeingredientsthatihaveinmyho.us",
+    "www.whatcanimakefordinnerwiththeingredientsthatihaveinmyho.us"
+  ],
+  "engines": {
+    "node": "0.8.x"
   }
 }

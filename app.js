@@ -3,10 +3,13 @@
 var express   = require('express')
   , http      = require('http')
   , path      = require('path')
+  , log       = require('./log')
   , conductor = require('express-conductor')
   ;
 
 var app = express();
+
+app.log = log;
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);

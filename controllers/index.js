@@ -1,8 +1,8 @@
 "use strict";
 
-var models = require('../models')
-  , Recipe = models.Recipe
-  ;
+//var models = require('../models')
+//  , Recipe = models.Recipe
+//  ;
 
 exports.init = function(app) {
   app.get('/', index);
@@ -30,7 +30,7 @@ function updateFromInput(recipe, req) {
   recipe.name        = req.body.name;
   recipe.description = req.body.description;
 
-  for(var i = 0; i < req.body.ingredients) {
+  for(var i = 0; i < req.body.ingredients; i++) {
     if(recipe.ingredients && recipe.ingredients[i]) {
       recipe.ingredients[i] = req.body.ingredients[i];
     } else {
@@ -38,7 +38,7 @@ function updateFromInput(recipe, req) {
     }
   }
 
-  for(var i = 0; i < req.body.instructions) {
+  for(var i = 0; i < req.body.instructions; i++) {
     if(recipe.instructions && recipe.instructions[i]) {
       recipe.instructions[i] = req.body.instructions[i];
     } else {

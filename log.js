@@ -1,4 +1,5 @@
 var winston = require('winston')
+  , config  = require('./config')
   , Logger  = winston.Logger
   ;
 
@@ -30,6 +31,7 @@ var logger = new Logger({
       colorize: true
     }),
   ],
+  level: config.log,
   levels: levels.levels
 });
 

@@ -1,9 +1,10 @@
 "use strict";
 
-var mongoose = require('mongoose')
-  , models   = require('./')
-  , config   = require('../config')
-  , Schema   = mongoose.Schema
+var mongoose     = require('mongoose')
+  , mongoosastic = require('mongoosastic')
+  , models       = require('./')
+  , config       = require('../config')
+  , Schema       = mongoose.Schema
   ;
 
 var RecipeSchema = new Schema({
@@ -21,6 +22,10 @@ var RecipeSchema = new Schema({
       amount: Number
     }
   ]
+});
+
+RecipeSchema.plugin(mongoosastic, {
+  host: config.mongoosastic
 });
 
 module.exports = RecipeSchema;

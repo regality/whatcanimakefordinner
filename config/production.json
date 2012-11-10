@@ -1,4 +1,6 @@
 {
   "host": "www.whatcanimakefordinnerwiththeingredientsthatihaveinmyho.us",
-  "mongo": "mongo01.ifit-dev.com/dinner"
+  "mongoosastic": "elasticsearch.ifit-dev.com",
+  "mongo": "mongo01.ifit-dev.com/dinner",
+  "log": "verbose"
 }

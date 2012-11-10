@@ -8,7 +8,9 @@ var fs       = require('fs')
   , db       = mongoose.createConnection(config.mongo)
   ;
 
-[
+log.info("mongo connecting to " + config.mongo);
+
+;[
   'error', 'disconnected', 'open',
   'close', 'reconnected',  'fullsetup'
 ].forEach(function(e) {

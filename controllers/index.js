@@ -10,6 +10,8 @@ exports.init = function(app) {
   app.post('/add', createRecipe);
   app.get('/search', searchRecipes);
   app.get('/details/:id', recipeDetails);
+  app.get('/fix', fixRecipes);
+  app.post('/fix', postFixRecipes);
 }
 
 function index(req, res, next) {
@@ -69,5 +71,31 @@ function recipeDetails(req, res, next) {
   Recipe.find({_id: req.params.id}, function(err, docs) {
     if(err) return res.send(500, err);
     res.render('details', {recipe: docs[0]});
+  });
+}
+
+function fixRecipes(req, res, next) {
+  var unacceptable = ['started', 'done'];
+  Recipe.findOne({fixed: {$nin: unacceptable}}, function(err, recipe) {
+    for(var i = 0; i< recipe.ingredients.length; i++) {
+      recipe.ingredients[i].name = recipe.ingredients[i].name.replace(/\(.*\)/,'').trim()
+    }
+    recipe.fixed = 'started';
+    recipe.save(function() {
+      res.render('fix', {recipe: recipe});
+    });
+  });
+}
+
+function postFixRecipes(req, res, next) {
+  var fixedIngredients = req.body.name;
+  Recipe.findOne({_id: req.body.recipe_id}, function(err, recipe) {
+    for(var i = 0; i< fixedIngredients.length; i++) {
+      recipe.ingredients[i].name = fixedIngredients[i];
+    }
+    recipe.fixed = 'done';
+    recipe.save(function() {
+      res.redirect('fix');
+    });
   });
 }

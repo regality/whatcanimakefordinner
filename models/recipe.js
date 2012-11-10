@@ -15,6 +15,7 @@ var RecipeSchema = new Schema({
   number_of_servings: Number,
   fat_secret_id: { type: Number, unique: true, sparse: true},
   image_url: String,
+  fixed: String,
   instructions: [
     {
       instruction: String

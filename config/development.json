@@ -1,6 +1,6 @@
 {
   "host": "local.whatcanimakefordinnerwiththeingredientsthatihaveinmyho.us:3000",
-  "mongoosastic": "elasticsearch.ifit-dev.com",
-  "mongo": "mongo01.ifit-dev.com/dinner",
+  "mongoosastic": "localhost",
+  "mongo": "localhost/dinner",
   "log": "verbose"
 }

@@ -4,8 +4,12 @@ body {
   background: #eee;
 }
 
+a:hover {
+  color: #000;
+}
+
 a {
-  color: #00B7FF;
+  color: #333;
 }
 
 .result {
@@ -14,6 +18,7 @@ a {
   margin: 10px 0px;
   height: 100px;
 }
+
 
 .result .name {
   font-weight: bold;

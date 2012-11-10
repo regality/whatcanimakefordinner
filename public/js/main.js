@@ -391,34 +391,6 @@ process.binding = function (name) {
 
 });
 
-require.define("search-result.jade",function(require,module,exports,__dirname,__filename,process,global){module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
-attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
-var buf = [];
-with (locals || {}) {
-var interp;
-buf.push('<div class="result"><div class="row"><div class="span4"><div class="name">');
-var __val__ = name
-buf.push(escape(null == __val__ ? "" : __val__));
-buf.push('</div><div class="description">');
-var __val__ = description
-buf.push(escape(null == __val__ ? "" : __val__));
-buf.push('</div></div><div class="span2">');
-if ( image_url)
-{
-buf.push('<img');
-buf.push(attrs({ 'src':(image_url) }, {"src":true}));
-buf.push('/>');
-}
-else
-{
-buf.push('<img src="/img/default-food.gif"/>');
-}
-buf.push('</div></div></div>');
-}
-return buf.join("");
-}
-});
-
 require.define("/node_modules/jquery-browserify/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {"main":"./lib/jquery.js","browserify":{"dependencies":"","main":"lib/jquery.js"}}
 });
 
@@ -9757,6 +9729,58 @@ return jQuery;
 
 });
 
+require.define("/client/search.js",function(require,module,exports,__dirname,__filename,process,global){"use strict";
+
+var $       = require('jquery-browserify')
+  , render  = require('./render')
+  , counter = 1
+  , timer   = null
+  , lastval
+  ;
+
+$('input#search').on('keyup', function(e) {
+  var $results = $("#search-results");
+  var $this = $(this);
+  var val = $this.val();
+  if (!val) return;
+  if (val === lastval) return;
+  if (timer) {
+    clearTimeout(timer);
+    timer = null;
+  }
+  lastval = val;
+  var c = ++counter;
+  timer = setTimeout(makeRequest, 300);
+
+  function makeRequest() {
+    timer = null;
+    $.ajax({
+      url: '/search',
+      data: {
+        q: val
+      },
+      success: onSuccess
+    });
+  }
+
+  function onSuccess(data) {
+    if (counter > c) return; // we are too late
+    $results.html('');
+    data.results.forEach(function(item) {
+      var html = render('search-result', {
+        name: item.name,
+        description: item.description,
+        image_url: item.image_url,
+        _id: item._id
+      });
+      $results.append(html);
+    });
+  }
+
+});
+
+});
+
 require.define("/client/render.js",function(require,module,exports,__dirname,__filename,process,global){"use strict";
 
 var browserijade = require('browserijade')
@@ -9991,55 +10015,34 @@ require.define("fs",function(require,module,exports,__dirname,__filename,process
 
 });
 
-require.define("/client/search.js",function(require,module,exports,__dirname,__filename,process,global){"use strict";
-
-var $       = require('jquery-browserify')
-  , render  = require('./render')
-  , counter = 1
-  , timer   = null
-  , lastval
-  ;
-
-$('input#search').on('keyup', function(e) {
-  var $results = $("#search-results");
-  var $this = $(this);
-  var val = $this.val();
-  if (!val) return;
-  if (val === lastval) return;
-  if (timer) {
-    clearTimeout(timer);
-    timer = null;
-  }
-  lastval = val;
-  var c = ++counter;
-  timer = setTimeout(makeRequest, 300);
-
-  function makeRequest() {
-    timer = null;
-    $.ajax({
-      url: '/search',
-      data: {
-        q: val
-      },
-      success: onSuccess
-    });
-  }
-
-  function onSuccess(data) {
-    if (counter > c) return; // we are too late
-    $results.html('');
-    data.results.forEach(function(item) {
-      var html = render('search-result', {
-        name: item.name,
-        description: item.description,
-        image_url: item.image_url
-      });
-      $results.append(html);
-    });
-  }
-
-});
-
+require.define("search-result.jade",function(require,module,exports,__dirname,__filename,process,global){module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div class="result"><a');
+buf.push(attrs({ 'href':("/details/" + _id) }, {"href":true}));
+buf.push('><div class="row"><div class="span4"><div class="name">');
+var __val__ = name
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</div><div class="description">');
+var __val__ = description
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</div></div><div class="span2">');
+if ( image_url)
+{
+buf.push('<img');
+buf.push(attrs({ 'src':(image_url) }, {"src":true}));
+buf.push('/>');
+}
+else
+{
+buf.push('<img src="/img/default-food.gif"/>');
+}
+buf.push('</div></div></a></div>');
+}
+return buf.join("");
+}
 });
 
 require.alias("jquery-browserify", "/node_modules/jquery");

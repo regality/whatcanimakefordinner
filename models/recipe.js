@@ -13,13 +13,11 @@ var RecipeSchema = new Schema({
   cook_time_min: Number,
   prep_time_min: Number,
   number_of_servings: Number,
-  image: String,
   fat_secret_id: { type: Number, unique: true, sparse: true},
   image_url: String,
   instructions: [
     {
-      instruction: String,
-      number: Number
+      instruction: String
     }
   ],
   ingredients: [

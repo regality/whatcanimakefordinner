@@ -1,3 +1,10 @@
 .result
-  .name= name
-  .description= description
+  .row
+    .span3
+      .name= name
+      .description= description
+    .span2
+      if image_url
+        img(src=image_url)
+      else
+        img(src="/img/default-food.jpg")

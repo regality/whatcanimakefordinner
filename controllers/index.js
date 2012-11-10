@@ -9,6 +9,7 @@ exports.init = function(app) {
   app.get('/add', addRecipe);
   app.post('/add', createRecipe);
   app.get('/search', searchRecipes);
+  app.get('/details/:id', recipeDetails);
 }
 
 function index(req, res, next) {
@@ -60,5 +61,12 @@ function searchRecipes(req, res, next) {
       count: hits.length,
       results: hits.slice(0, 50)
     });
+  });
+}
+
+function recipeDetails(req, res, next) {
+  Recipe.find({_id: req.params.id}, function(err, docs) {
+    if(err) return res.send(500, err);
+    res.render('details', {recipe: docs[0]});
   });
 }

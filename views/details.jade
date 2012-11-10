@@ -1,0 +1,38 @@
+extends layout
+
+block content
+  .container
+    .row
+      .span12(style="text-align:center")
+        h1 What Can I Make For Dinner With The
+        h1 Ingredients That I Have In My House
+    .row.recipe
+      .span6(style="text-align:center")
+        h3=recipe.name
+        h4=recipe.description
+        .row
+          .span3
+            - if(recipe.prep_time_min)
+                h3 Prep Time: #{recipe.prep_time_min} min.
+          .span3
+            - if(recipe.cook_time_min)
+                h3 Cook Time: #{recipe.cook_time_min} min.
+        - if(recipe.number_of_servings)
+            h3 Servings: #{recipe.number_of_servings}
+      .span6.image_url
+        - if(recipe.image_url)
+            img(src=recipe.image_url)
+        - else
+            img(src='/img/default-food.gif')
+    .row.recipe
+      .span6.ingredients
+        ul
+          each ingredient in recipe.ingredients
+            li
+              i.icon-asterisk
+              | &nbsp;&nbsp;
+              = ingredient.description
+      .span6.instructions
+        ol
+          each instruction in recipe.instructions
+            li=instruction.instruction

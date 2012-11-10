@@ -2,6 +2,7 @@
 
 var mongoose     = require('mongoose')
   , mongoosastic = require('mongoosastic')
+  , waitress     = require('waitress')
   , models       = require('./')
   , config       = require('../config')
   , Schema       = mongoose.Schema
@@ -34,12 +35,13 @@ RecipeSchema.plugin(mongoosastic, {
   host: config.mongoosastic
 });
 
-RecipeSchema.post('save', function() {
+RecipeSchema.pre('save', function(next) {
   var Ingredient = models.Ingredient;
 
+  var id = this._id;
+  var done = waitress(this.ingredients.length, next);
   this.ingredients.forEach(function(ingredient) {
-    var i = new Ingredient({ name: ingredient.name });
-    i.save(function() {});
+    Ingredient.addRecipeToIngredient(ingredient.name, id, done);
   });
 });
 

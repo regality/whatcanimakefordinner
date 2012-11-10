@@ -10,8 +10,8 @@ a {
 
 .result {
   border-bottom: 1px solid #bbb;
-  padding: 10px;
-  margin: 10px;
+  padding: 10px 0px;
+  margin: 10px 0px;
   height: 100px;
 }
 

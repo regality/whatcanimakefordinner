@@ -50,6 +50,7 @@ function updateFromInput(recipe, req) {
 }
 
 function searchRecipes(req, res, next) {
+  console.log('searching for ' + req.query.q);
   Recipe.search({query: req.query.q + '*'}, function(err, results) {
     if (err) return next(err);
     var hits = results.hits.hits.map(function(v) {

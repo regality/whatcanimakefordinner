@@ -1,3 +1,4 @@
 {
+  "host": "local.whatcanimakefordinnerwiththeingredientsthatihaveinmyho.us:3000",
   "mongo": "localhost/dinner"
 }

@@ -10,16 +10,24 @@ var mongoose     = require('mongoose')
 var RecipeSchema = new Schema({
   name: String,
   description: String,
+  cook_time_min: Number,
+  prep_time_min: Number,
+  number_of_servings: Number,
+  image: String,
+  fat_secret_id: { type: Number, unique: true, sparse: true},
+  image_url: String,
   instructions: [
     {
-      instruction: String
+      instruction: String,
+      number: Number
     }
   ],
   ingredients: [
     {
       name: String,
       unit: String,
-      amount: Number
+      amount: Number,
+      description: String
     }
   ]
 });

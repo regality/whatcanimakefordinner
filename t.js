@@ -37,5 +37,5 @@ var r = new Recipe({
 
 r.save(function(e) {
   if (e) throw e;
-  //process.exit();
+  process.exit();
 });

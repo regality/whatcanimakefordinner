@@ -37,13 +37,17 @@ RecipeSchema.plugin(mongoosastic, {
 });
 
 RecipeSchema.pre('save', function(next) {
-  var Ingredient = models.Ingredient;
+  if (this.fixed === 'done') {
+    var Ingredient = models.Ingredient;
 
-  var id = this._id;
-  var done = waitress(this.ingredients.length, next);
-  this.ingredients.forEach(function(ingredient) {
-    Ingredient.addRecipeToIngredient(ingredient.name, id, done);
-  });
+    var id = this._id;
+    var done = waitress(this.ingredients.length, next);
+    this.ingredients.forEach(function(ingredient) {
+      Ingredient.addRecipeToIngredient(ingredient.name, id, done);
+    });
+  } else {
+    next();
+  }
 });
 
 module.exports = RecipeSchema;

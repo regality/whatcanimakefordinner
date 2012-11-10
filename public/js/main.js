@@ -396,7 +396,9 @@ attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow |
 var buf = [];
 with (locals || {}) {
 var interp;
-buf.push('<div class="result"><div class="row"><div class="span4"><div class="name">');
+buf.push('<div class="result"><a');
+buf.push(attrs({ 'href':("/details/" + _id) }, {"href":true}));
+buf.push('><div class="row"><div class="span4"><div class="name">');
 var __val__ = name
 buf.push(escape(null == __val__ ? "" : __val__));
 buf.push('</div><div class="description">');
@@ -413,7 +415,7 @@ else
 {
 buf.push('<img src="/img/default-food.gif"/>');
 }
-buf.push('</div></div></div>');
+buf.push('</div></div></a></div>');
 }
 return buf.join("");
 }
@@ -9757,6 +9759,48 @@ return jQuery;
 
 });
 
+require.define("/client/typeahead.js",function(require,module,exports,__dirname,__filename,process,global){require('./bootstrap.js');
+
+$("input#search").typeahead({
+  source: searchIngredient,
+  items: 10,
+  minLength: 1,
+  matcher: function() {
+    return true;
+  },
+  highlighter: function(item) {
+    return item.name;
+  },
+  sorter: function(items) {
+    return items;
+  },
+  updater: function(item) {
+    item = JSON.parse(item);
+    $("#ingredient-list").append(item.name + '<br/>')
+    return '';
+  }
+});
+
+function searchIngredient(query, cb) {
+  $.ajax({
+    url: '/search/ingredient',
+    data: {
+      q: query
+    },
+    success: function(data) {
+      //var results = data.results.map(function(v) { return v.name; });
+      for (var i = 0; i < data.results.length; ++i) {
+        data.results[i].toString = function() {
+          return JSON.stringify(this);
+        }
+      }
+      cb(data.results);
+    }
+  });
+}
+
+});
+
 require.define("/client/bootstrap.js",function(require,module,exports,__dirname,__filename,process,global){/* ===================================================
  * bootstrap-transition.js v2.2.1
  * http://twitter.github.com/bootstrap/javascript.html#transitions
@@ -11782,48 +11826,6 @@ require.define("/client/bootstrap.js",function(require,module,exports,__dirname,
 
 
 }(window.jQuery);
-});
-
-require.define("/client/typeahead.js",function(require,module,exports,__dirname,__filename,process,global){require('./bootstrap.js');
-
-$("input#search").typeahead({
-  source: searchIngredient,
-  items: 10,
-  minLength: 1,
-  matcher: function() {
-    return true;
-  },
-  highlighter: function(item) {
-    return item.name;
-  },
-  sorter: function(items) {
-    return items;
-  },
-  updater: function(item) {
-    item = JSON.parse(item);
-    $("#ingredient-list").append(item.name + '<br/>')
-    return '';
-  }
-});
-
-function searchIngredient(query, cb) {
-  $.ajax({
-    url: '/search/ingredient',
-    data: {
-      q: query
-    },
-    success: function(data) {
-      //var results = data.results.map(function(v) { return v.name; });
-      for (var i = 0; i < data.results.length; ++i) {
-        data.results[i].toString = function() {
-          return JSON.stringify(this);
-        }
-      }
-      cb(data.results);
-    }
-  });
-}
-
 });
 
 require.alias("jquery-browserify", "/node_modules/jquery");

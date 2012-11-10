@@ -4,8 +4,12 @@ body {
   background: #eee;
 }
 
+a:hover {
+  color: #000;
+}
+
 a {
-  color: #00B7FF;
+  color: #333;
 }
 
 .result {
@@ -14,6 +18,7 @@ a {
   margin: 10px 0px;
   height: 100px;
 }
+
 
 .result .name {
   font-weight: bold;
@@ -31,4 +36,26 @@ input#search {
   margin-top: 30px;
   padding-top: 30px;
   border-top: 1px solid #bbb;
+}
+
+.recipe {
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid #bbb;
+}
+
+.recipe ul li {
+  list-style-type: none;
+}
+
+.recipe li {
+  padding-bottom: 10px;
+}
+
+.iframe {
+  position:absolute;
+  padding-bottom: 10px;
+  bottom:0;
+  width:100%;
+  height:25px;
 }

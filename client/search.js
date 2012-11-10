@@ -39,7 +39,8 @@ $('input#search').on('keyup', function(e) {
       var html = render('search-result', {
         name: item.name,
         description: item.description,
-        image_url: item.image_url
+        image_url: item.image_url,
+        _id: item._id
       });
       $results.append(html);
     });

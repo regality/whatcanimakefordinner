@@ -36,4 +36,13 @@ RecipeSchema.plugin(mongoosastic, {
   host: config.mongoosastic
 });
 
+RecipeSchema.post('save', function() {
+  var Ingredient = models.Ingredient;
+
+  this.ingredients.forEach(function(ingredient) {
+    var i = new Ingredient({ name: ingredient.name });
+    i.save(function() {});
+  });
+});
+
 module.exports = RecipeSchema;

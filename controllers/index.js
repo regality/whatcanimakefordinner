@@ -1,13 +1,14 @@
 "use strict";
 
-//var models = require('../models')
-//  , Recipe = models.Recipe
-//  ;
+var models = require('../models')
+  , Recipe = models.Recipe
+  ;
 
 exports.init = function(app) {
   app.get('/', index);
   app.get('/add', addRecipe);
   app.post('/add', createRecipe);
+  app.get('/search', searchRecipes);
 }
 
 function index(req, res, next) {
@@ -24,7 +25,6 @@ function createRecipe(req, res, next) {
     res.redirect('/')
   });
 }
-
 
 function updateFromInput(recipe, req) {
   recipe.name        = req.body.name;
@@ -46,4 +46,11 @@ function updateFromInput(recipe, req) {
     }
   }
   return recipe;
+}
+
+function searchRecipes(req, res, next) {
+  Recipe.search({query: req.query.q + '*'}, function(err, results) {
+    if (err) return next(err);
+    res.json(results.hits.hits);
+  });
 }

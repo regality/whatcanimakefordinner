@@ -1,3 +1,6 @@
 {
-  "mongo": "localhost/dinner"
+  "host": "local.whatcanimakefordinnerwiththeingredientsthatihaveinmyho.us:3000",
+  "mongoosastic": "localhost",
+  "mongo": "localhost/dinner",
+  "log": "verbose"
 }

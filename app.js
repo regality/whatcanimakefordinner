@@ -3,8 +3,9 @@
 var express   = require('express')
   , http      = require('http')
   , path      = require('path')
-  , log       = require('./log')
   , conductor = require('express-conductor')
+  , log       = require('./log')
+  , config    = require('./config')
   ;
 
 var app = express();
@@ -19,6 +20,13 @@ app.configure(function(){
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
+  app.use(function(req, res, next) {
+    if (req.get('host') !== config.host) {
+      res.redirect('http://' + config.host + req.url);
+    } else {
+      next();
+    }
+  });
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
 });

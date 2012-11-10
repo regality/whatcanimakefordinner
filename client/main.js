@@ -4,4 +4,6 @@ window.requrie = require;
 window.jQuery = $;
 window.$ = $;
 
-console.log('rawr');
+$(function() {
+  require('./search');
+});

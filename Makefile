@@ -4,13 +4,7 @@ run:
 _run: start browserify
 
 start:
-	NODE_ENV=development supervisor app.js
+	NODE_ENV=development supervisor -w controllers app.js
 
 browserify:
-	browserify \
-		--verbose \
-		--watch \
-		--alias 'jquery:jquery-browserify' \
-		--require 'jquery-browserify' \
-		--entry client/main.js \
-		--outfile public/js/main.js
+	node ./bin/browserify.js

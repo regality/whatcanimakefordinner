@@ -12,7 +12,7 @@
 require.paths = [];
 require.modules = {};
 require.cache = {};
-require.extensions = [".js",".coffee",".json"];
+require.extensions = [".js",".coffee",".json",".jade"];
 
 require._core = {
     'assert': true,
@@ -391,7 +391,27 @@ process.binding = function (name) {
 
 });
 
-require.define("jquery-browserify",function(require,module,exports,__dirname,__filename,process,global){// Uses Node, AMD or browser globals to create a module.
+require.define("search-result.jade",function(require,module,exports,__dirname,__filename,process,global){module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div class="result"><div class="name">');
+var __val__ = name
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</div><div class="description">');
+var __val__ = description
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</div></div>');
+}
+return buf.join("");
+}
+});
+
+require.define("/node_modules/jquery-browserify/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {"main":"./lib/jquery.js","browserify":{"dependencies":"","main":"lib/jquery.js"}}
+});
+
+require.define("/node_modules/jquery-browserify/lib/jquery.js",function(require,module,exports,__dirname,__filename,process,global){// Uses Node, AMD or browser globals to create a module.
 
 // If you want something that will work in other stricter CommonJS environments,
 // or if you need to create a circular dependency, see commonJsStrict.js
@@ -9726,16 +9746,285 @@ return jQuery;
 
 });
 
+require.define("/client/search.js",function(require,module,exports,__dirname,__filename,process,global){"use strict";
+
+var $      = require('jquery-browserify')
+  , render = require('./render')
+
+var lastval;
+$('input#search').on('keyup', function(e) {
+  var $results = $("#search-results");
+  $results.html('');
+  var $this = $(this);
+  var val = $this.val();
+  if (!val) return;
+  if (val === lastval) return;
+  lastval = val;
+  $.ajax({
+    url: '/search',
+    data: {
+      q: val
+    },
+    success: function(data) {
+      data.results.forEach(function(item) {
+        var html = render('search-result', {
+          name: item.name,
+          description: item.description
+        });
+        $results.append(html);
+      });
+    }
+  });
+});
+
+});
+
+require.define("/client/render.js",function(require,module,exports,__dirname,__filename,process,global){"use strict";
+
+var browserijade = require('browserijade')
+  , $            = require('jquery')
+  ;
+
+$.fn.render = function(view, locals) {
+  return this.each(function() {
+    var _locals = locals;
+    if (typeof locals === 'function') {
+      _locals = locals.call(this);
+    }
+    var html = render(view, _locals);
+    $(this).html(html);
+  });
+};
+
+function render(view, locals) {
+  var html = browserijade(view, locals);
+  return html;
+}
+
+module.exports = render;
+
+});
+
+require.define("/node_modules/browserijade/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {"main":"./lib/middleware","browserify":"./lib/browserijade"}
+});
+
+require.define("/node_modules/browserijade/lib/browserijade.js",function(require,module,exports,__dirname,__filename,process,global){// Browserijade
+// (c) 2011 David Ed Mellum
+// Browserijade may be freely distributed under the MIT license.
+
+jade = require('jade/lib/runtime');
+
+// Render a jade file from an included folder in the Browserify
+// bundle by a path local to the included templates folder.
+var renderFile = function(path, locals) {
+	locals = locals || {};
+	path = path + '.jade';
+	template = require(path);
+	return template(locals);
+}
+
+// Render a pre-compiled Jade template in a self-executing closure.
+var renderString = function(template) {
+	return eval(template);
+}
+
+module.exports = renderFile;
+module.exports.renderString = renderString;
+});
+
+require.define("/node_modules/jade/lib/runtime.js",function(require,module,exports,__dirname,__filename,process,global){
+/*!
+ * Jade - runtime
+ * Copyright(c) 2010 TJ Holowaychuk <tj@vision-media.ca>
+ * MIT Licensed
+ */
+
+/**
+ * Lame Array.isArray() polyfill for now.
+ */
+
+if (!Array.isArray) {
+  Array.isArray = function(arr){
+    return '[object Array]' == Object.prototype.toString.call(arr);
+  };
+}
+
+/**
+ * Lame Object.keys() polyfill for now.
+ */
+
+if (!Object.keys) {
+  Object.keys = function(obj){
+    var arr = [];
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        arr.push(key);
+      }
+    }
+    return arr;
+  }
+}
+
+/**
+ * Merge two attribute objects giving precedence
+ * to values in object `b`. Classes are special-cased
+ * allowing for arrays and merging/joining appropriately
+ * resulting in a string.
+ *
+ * @param {Object} a
+ * @param {Object} b
+ * @return {Object} a
+ * @api private
+ */
+
+exports.merge = function merge(a, b) {
+  var ac = a['class'];
+  var bc = b['class'];
+
+  if (ac || bc) {
+    ac = ac || [];
+    bc = bc || [];
+    if (!Array.isArray(ac)) ac = [ac];
+    if (!Array.isArray(bc)) bc = [bc];
+    ac = ac.filter(nulls);
+    bc = bc.filter(nulls);
+    a['class'] = ac.concat(bc).join(' ');
+  }
+
+  for (var key in b) {
+    if (key != 'class') {
+      a[key] = b[key];
+    }
+  }
+
+  return a;
+};
+
+/**
+ * Filter null `val`s.
+ *
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api private
+ */
+
+function nulls(val) {
+  return val != null;
+}
+
+/**
+ * Render the given attributes object.
+ *
+ * @param {Object} obj
+ * @param {Object} escaped
+ * @return {String}
+ * @api private
+ */
+
+exports.attrs = function attrs(obj, escaped){
+  var buf = []
+    , terse = obj.terse;
+
+  delete obj.terse;
+  var keys = Object.keys(obj)
+    , len = keys.length;
+
+  if (len) {
+    buf.push('');
+    for (var i = 0; i < len; ++i) {
+      var key = keys[i]
+        , val = obj[key];
+
+      if ('boolean' == typeof val || null == val) {
+        if (val) {
+          terse
+            ? buf.push(key)
+            : buf.push(key + '="' + key + '"');
+        }
+      } else if (0 == key.indexOf('data') && 'string' != typeof val) {
+        buf.push(key + "='" + JSON.stringify(val) + "'");
+      } else if ('class' == key && Array.isArray(val)) {
+        buf.push(key + '="' + exports.escape(val.join(' ')) + '"');
+      } else if (escaped && escaped[key]) {
+        buf.push(key + '="' + exports.escape(val) + '"');
+      } else {
+        buf.push(key + '="' + val + '"');
+      }
+    }
+  }
+
+  return buf.join(' ');
+};
+
+/**
+ * Escape the given string of `html`.
+ *
+ * @param {String} html
+ * @return {String}
+ * @api private
+ */
+
+exports.escape = function escape(html){
+  return String(html)
+    .replace(/&(?!(\w+|\#\d+);)/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+};
+
+/**
+ * Re-throw the given `err` in context to the
+ * the jade in `filename` at the given `lineno`.
+ *
+ * @param {Error} err
+ * @param {String} filename
+ * @param {String} lineno
+ * @api private
+ */
+
+exports.rethrow = function rethrow(err, filename, lineno){
+  if (!filename) throw err;
+
+  var context = 3
+    , str = require('fs').readFileSync(filename, 'utf8')
+    , lines = str.split('\n')
+    , start = Math.max(lineno - context, 0)
+    , end = Math.min(lines.length, lineno + context);
+
+  // Error context
+  var context = lines.slice(start, end).map(function(line, i){
+    var curr = i + start + 1;
+    return (curr == lineno ? '  > ' : '    ')
+      + curr
+      + '| '
+      + line;
+  }).join('\n');
+
+  // Alter exception message
+  err.path = filename;
+  err.message = (filename || 'Jade') + ':' + lineno
+    + '\n' + context + '\n\n' + err.message;
+  throw err;
+};
+
+});
+
+require.define("fs",function(require,module,exports,__dirname,__filename,process,global){// nothing to see here... no file methods for the browser
+
+});
+
 require.alias("jquery-browserify", "/node_modules/jquery");
 
-require.define("/main.js",function(require,module,exports,__dirname,__filename,process,global){var $ = require('jquery-browserify');
+require.define("/client/main.js",function(require,module,exports,__dirname,__filename,process,global){var $ = require('jquery-browserify');
 
 window.requrie = require;
 window.jQuery = $;
 window.$ = $;
 
-console.log('rawr');
+$(function() {
+  require('./search');
+});
 
 });
-require("/main.js");
+require("/client/main.js");
 })();

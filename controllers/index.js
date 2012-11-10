@@ -51,6 +51,14 @@ function updateFromInput(recipe, req) {
 function searchRecipes(req, res, next) {
   Recipe.search({query: req.query.q + '*'}, function(err, results) {
     if (err) return next(err);
-    res.json(results.hits.hits);
+    var hits = results.hits.hits.map(function(v) {
+      var o = v._source;
+      o._id = v._id;
+      return o;
+    });
+    res.json({
+      count: hits.length,
+      results: hits.slice(0, 50)
+    });
   });
 }

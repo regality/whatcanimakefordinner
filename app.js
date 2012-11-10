@@ -20,6 +20,20 @@ app.configure(function(){
   app.use(express.static(path.join(__dirname, 'public')));
 });
 
+app.configure('development', function() {
+  app.locals({
+    pretty: true
+  });
+});
+
+app.configure('production', function() {
+  app.locals({
+    pretty: false,
+    debug: false,
+    compileDebug: false
+  });
+});
+
 app.configure('development', function(){
   app.use(express.errorHandler());
 });

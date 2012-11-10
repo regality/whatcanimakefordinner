@@ -19,7 +19,7 @@ block content
                 h3 Cook Time: #{recipe.cook_time_min} min.
         - if(recipe.number_of_servings)
             h3 Servings: #{recipe.number_of_servings}
-      .span6.image_url
+      .span6.image_url(style="text-align:center")
         - if(recipe.image_url)
             img(src=recipe.image_url)
         - else

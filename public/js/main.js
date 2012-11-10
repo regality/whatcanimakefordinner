@@ -391,6 +391,36 @@ process.binding = function (name) {
 
 });
 
+require.define("search-result.jade",function(require,module,exports,__dirname,__filename,process,global){module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div class="result"><a');
+buf.push(attrs({ 'href':("/details/" + _id) }, {"href":true}));
+buf.push('><div class="row"><div class="span4"><div class="name">');
+var __val__ = name
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</div><div class="description">');
+var __val__ = description
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</div></div><div class="span2">');
+if ( image_url)
+{
+buf.push('<img');
+buf.push(attrs({ 'src':(image_url) }, {"src":true}));
+buf.push('/>');
+}
+else
+{
+buf.push('<img src="/img/default-food.gif"/>');
+}
+buf.push('</div></div></a></div>');
+}
+return buf.join("");
+}
+});
+
 require.define("/node_modules/jquery-browserify/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {"main":"./lib/jquery.js","browserify":{"dependencies":"","main":"lib/jquery.js"}}
 });
 
@@ -10013,36 +10043,6 @@ exports.rethrow = function rethrow(err, filename, lineno){
 
 require.define("fs",function(require,module,exports,__dirname,__filename,process,global){// nothing to see here... no file methods for the browser
 
-});
-
-require.define("search-result.jade",function(require,module,exports,__dirname,__filename,process,global){module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
-attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
-var buf = [];
-with (locals || {}) {
-var interp;
-buf.push('<div class="result"><a');
-buf.push(attrs({ 'href':("/details/" + _id) }, {"href":true}));
-buf.push('><div class="row"><div class="span4"><div class="name">');
-var __val__ = name
-buf.push(escape(null == __val__ ? "" : __val__));
-buf.push('</div><div class="description">');
-var __val__ = description
-buf.push(escape(null == __val__ ? "" : __val__));
-buf.push('</div></div><div class="span2">');
-if ( image_url)
-{
-buf.push('<img');
-buf.push(attrs({ 'src':(image_url) }, {"src":true}));
-buf.push('/>');
-}
-else
-{
-buf.push('<img src="/img/default-food.gif"/>');
-}
-buf.push('</div></div></a></div>');
-}
-return buf.join("");
-}
 });
 
 require.alias("jquery-browserify", "/node_modules/jquery");

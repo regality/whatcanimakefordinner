@@ -1,28 +1,19 @@
 function popover(id, name, ingredients) {
-  var listedIngredientsObj = require('./typeahead')
+  var render = require('./render');
+  var listedIngredientsObj = require('./typeahead');
   var listedIngredients = [];
   var $ = this.$;
   var _id = "." + id;
-  var htmlIngredients = '<ul>'
-  name = '<h4>' + name + '</h4>';
-
   for(key in listedIngredientsObj.used) {
     listedIngredients.push(key);
   }
-  console.log(listedIngredients);
+  var htmlIngredients = render('popover', {
+    listedIngredients: listedIngredients,
+    ingredients: ingredients
+  })
 
-  for(var i = 0; i < ingredients.length; i++) {
-    var tmp = '<li>';
-    console.log(ingredients[i].name);
-    if(listedIngredients.indexOf(ingredients[i].name) != -1) {
-      tmp = tmp.concat('<i class="icon-ok"></i>');
-    } else {
-      tmp = tmp.concat('<i class="icon-asterisk"></i>');
-    }
-    tmp = tmp.concat("&nbsp;&nbsp;" +ingredients[i].description + '</li>');
-    htmlIngredients = htmlIngredients.concat(tmp);
-  }
-  htmlIngredients = htmlIngredients.concat('</ul>');
+  name = '<h4>' + name + '</h4>';
+
   $(_id).popover({
     html: true,
     placement: 'left',

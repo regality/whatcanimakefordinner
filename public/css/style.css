@@ -28,6 +28,10 @@ a {
   width: 140px;
 }
 
+.result img.check {
+  width: 14px;
+}
+
 .image-clip {
   height: 120px;
   overflow: hidden;

@@ -9,14 +9,14 @@ a:hover {
 }
 
 a {
-  color: #333;
+  color: #666;
 }
 
 .result {
   border-bottom: 1px solid #bbb;
   padding: 10px 0px;
   margin: 10px 0px;
-  height: 100px;
+  height: 120px;
 }
 
 
@@ -25,7 +25,12 @@ a {
 }
 
 .result img {
-  height: 80px;
+  width: 140px;
+}
+
+.image-clip {
+  height: 120px;
+  overflow: hidden;
 }
 
 .result a {

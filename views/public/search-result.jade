@@ -1,19 +1,20 @@
 .result
-  a(class="#{_id}", href="/details/" + _id)
+  a(class="#{_id}", href="/details/" + _id, target="_BLANK")
     .row
       .span4
-        .name= name
+        h4.name= name
         .description= description
       .span2
-        if image_url
-          img(src=image_url)
-        else
-          img(src="/img/default-food.gif")
+        .image-clip
+          if image_url
+            img(src=image_url)
+          else
+            img(src="/img/default-food.gif")
 
 script
   var $ = this.$;
   var _id = ".#{_id}";
-  var name = !{JSON.stringify(name)};
+  var name = '<h4>#{name}</h4>';
   var htmlIngredients = '<ul>'
 
   var ingredients = !{JSON.stringify(ingredients)};

@@ -53,9 +53,8 @@ input#search {
 }
 
 .iframe {
-  position:absolute;
-  padding-bottom: 10px;
-  bottom:0;
-  width:100%;
+  position: fixed;
+  bottom: 50px;
+  left: 50px;
   height:25px;
 }

@@ -49,7 +49,7 @@ input#search {
   border-top: 1px solid #bbb;
 }
 
-.recipe ul li {
+ul li {
   list-style-type: none;
 }
 

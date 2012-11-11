@@ -1,8 +1,8 @@
 "use strict";
 
-var $           = require('jquery-browserify')
-  , render      = require('./render')
-  , ingredients = require('./typeahead')
+var $             = require('jquery-browserify')
+  , render        = require('./render')
+  , ingredients   = require('./typeahead')
   ;
 
 ingredients.on('new', function() {

@@ -429,7 +429,7 @@ else
 {
 buf.push('<img src="/img/default-food.gif"/>');
 }
-buf.push('</div></div></a></div><script>var $ = this.$;\nvar _id = ".' + escape((interp = _id) == null ? '' : interp) + '";\nvar name = ' + ((interp = JSON.stringify(name)) == null ? '' : interp) + ';\nvar htmlIngredients = \'<ul>\'\n\nvar ingredients = ' + ((interp = JSON.stringify(ingredients)) == null ? '' : interp) + ';\nfor(var i = 0; i < ingredients.length; i++) {\n  var tmp = \'<li>\' + ingredients[i].description + \'</li>\';\n  htmlIngredients = htmlIngredients.concat(tmp);\n}\nhtmlIngredients = htmlIngredients.concat(\'</ul>\');\n$(_id).popover({\n  html: true,\n  placement: \'left\',\n  trigger: \'hover\',\n  title: name,\n  content: htmlIngredients\n});</script>');
+buf.push('</div></div></a></div><script>var popover = require(\'/client/popover\');\n\npopover(\'' + escape((interp = _id) == null ? '' : interp) + '\',\'' + escape((interp = name) == null ? '' : interp) + '\', ' + ((interp = JSON.stringify(ingredients)) == null ? '' : interp) + ');</script>');
 }
 return buf.join("");
 }
@@ -12267,9 +12267,12 @@ require.define("/client/bootstrap.js",function(require,module,exports,__dirname,
 
 require.define("/client/search.js",function(require,module,exports,__dirname,__filename,process,global){"use strict";
 
-var $           = require('jquery-browserify')
-  , render      = require('./render')
-  , ingredients = require('./typeahead')
+var $             = require('jquery-browserify')
+  , render        = require('./render')
+  , ingredients   = require('./typeahead')
+  , events        = require('events')
+  , EventEmitter  = events.EventEmitter
+  , searchResults = new EventEmitter()
   ;
 
 ingredients.on('new', function() {
@@ -12315,10 +12318,50 @@ function loadRecipes(recipes) {
         data[i].image_url = data[i].image_url || null;
         var html = render('search-result', data[i]);
         $('#search-results').append(html);
+        searchResults.emit('new', html);
       }
     }
   });
 }
+
+module.exports = searchResults;
+
+});
+
+require.define("/client/popover.js",function(require,module,exports,__dirname,__filename,process,global){function popover(id, name, ingredients) {
+  var listedIngredientsObj = require('./typeahead')
+  var listedIngredients = [];
+  var $ = this.$;
+  var _id = "." + id;
+  var htmlIngredients = '<ul>'
+
+  for(key in listedIngredientsObj.used) {
+    listedIngredients.push(key);
+  }
+  console.log(listedIngredients);
+
+  for(var i = 0; i < ingredients.length; i++) {
+    var tmp = '<li>';
+    console.log(ingredients[i].name);
+    if(listedIngredients.indexOf(ingredients[i].name) != -1) {
+      tmp = tmp.concat('<i class="icon-ok"></i>');
+    } else {
+      tmp = tmp.concat('<i class="icon-asterisk"></i>');
+    }
+    tmp = tmp.concat("&nbsp;&nbsp;" +ingredients[i].description + '</li>');
+    htmlIngredients = htmlIngredients.concat(tmp);
+  }
+  htmlIngredients = htmlIngredients.concat('</ul>');
+  $(_id).popover({
+    html: true,
+    placement: 'left',
+    trigger: 'hover',
+    title: name,
+    content: htmlIngredients
+  });
+}
+
+module.exports = popover;
 
 });
 
@@ -12326,13 +12369,14 @@ require.alias("jquery-browserify", "/node_modules/jquery");
 
 require.define("/client/main.js",function(require,module,exports,__dirname,__filename,process,global){var $ = require('jquery-browserify');
 
-window.requrie = require;
+window.require = require;
 window.jQuery = $;
 window.$ = $;
 
 $(function() {
   require('./typeahead');
   require('./search');
+  require('./popover');
 });
 
 });

@@ -2,45 +2,33 @@ var models = require('./models')
   , Ingredient = models.Ingredient
   ;
 
-
 var stream = Ingredient.find().stream()
   , total = 0
-  , count = 0
   , done = false
+  , queue = []
   ;
 
 stream.on('data', function(doc){
   total++;
-  count++;
-  console.log('fixing doc ' + total);
-  doc.name = doc.name.replace(/\(.*\)/, '').trim();
-  doc.save(function(err) {
-    if (err) console.log(err);
-    if (err && err.code == 11001) {
-      doc.remove(function() {
-        count--;
-        allDone();
-      });
-    } else {
-      count--;
-      allDone();
-    }
-  });
+  queue.push(doc);
 });
 
 stream.on('close', function() {
-  done = true;
-  allDone();
+  processQueue();
 });
 
 stream.on('error', function(err){
   throw err;
 });
 
-function allDone() {
-  if (count > 0) return;
-  if (!done) return;
-  console.log('fixed ' + total + ' documents!');
-  process.exit(0);
+function processQueue() {
+  if (!queue.length) process.exit(0);
+  var doc = queue.pop();
+  console.log(queue.length + ' left to index');
+  console.log('indexing ' + doc.name);
+  doc.index(function(err) {
+    if (err) console.log(err);
+    processQueue();
+  });
 }
 

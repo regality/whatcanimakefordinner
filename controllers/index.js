@@ -1,14 +1,17 @@
 "use strict";
 
-var models     = require('../models')
+var mongoose   = require('mongoose')
+  , models     = require('../models')
   , Recipe     = models.Recipe
   , Ingredient = models.Ingredient
+  , ObjectId   = mongoose.Types.ObjectId
   ;
 
 exports.init = function(app) {
   app.get('/', index);
   app.get('/add', addRecipe);
   app.post('/add', createRecipe);
+  app.get('/recipes/get', getRecipes);
   app.get('/search/recipe', searchRecipes);
   app.get('/search/ingredient', searchIngredient);
   app.get('/details/:id', recipeDetails);
@@ -28,6 +31,20 @@ function createRecipe(req, res, next) {
   var recipe = updateFromInput(new Recipe, req);
   recipe.save(function(err, doc) {
     res.redirect('/')
+  });
+}
+
+function getRecipes(req, res, next) {
+  var ids = req.query.ids.split(',').map(function(id) {
+    return { _id: ObjectId(id) }
+  });
+  Recipe.find({$or: ids}, function(err, docs) {
+    if (err) return next(err);
+    var ids = req.query.ids.split(',');
+    docs.sort(function(a, b) {
+      return ids.indexOf(a._id.toString()) - ids.indexOf(b._id.toString());
+    });
+    res.json(docs);
   });
 }
 

@@ -1,49 +1,54 @@
 "use strict";
 
-var $       = require('jquery-browserify')
-  , render  = require('./render')
-  , counter = 1
-  , timer   = null
-  , lastval
+var $           = require('jquery-browserify')
+  , render      = require('./render')
+  , ingredients = require('./typeahead')
   ;
 
-$('input#search').on('keyup', function(e) {
-  var $results = $("#search-results");
-  var $this = $(this);
-  var val = $this.val();
-  if (!val) return;
-  if (val === lastval) return;
-  if (timer) {
-    clearTimeout(timer);
-    timer = null;
+ingredients.on('new', function() {
+  var recipesArr = []
+    , recipes = {};
+  for (var i in ingredients.used) {
+    recipesArr = recipesArr.concat(ingredients.used[i].recipes);
   }
-  lastval = val;
-  var c = ++counter;
-  timer = setTimeout(makeRequest, 300);
-
-  function makeRequest() {
-    timer = null;
-    $.ajax({
-      url: '/search',
-      data: {
-        q: val
-      },
-      success: onSuccess
+  recipesArr.sort();
+  for (var i = 0; i < recipesArr.length; ++i) {
+    var id = recipesArr[i];
+    if (recipes[id]) {
+      recipes[id] = recipes[id] + 1;
+    } else {
+      recipes[id] = 1;
+    }
+  }
+  var ordered = [];
+  for (var id in recipes) {
+    ordered.push({
+      id: id,
+      count: recipes[id]
     });
   }
-
-  function onSuccess(data) {
-    if (counter > c) return; // we are too late
-    $results.html('');
-    data.results.forEach(function(item) {
-      var html = render('search-result', {
-        name: item.name,
-        description: item.description,
-        image_url: item.image_url,
-        _id: item._id
-      });
-      $results.append(html);
-    });
-  }
-
+  ordered.sort(function(a, b) {
+    return b.count - a.count;
+  });
+  var topRecipes = ordered.slice(0, 20);
+  loadRecipes(topRecipes);
 });
+
+function loadRecipes(recipes) {
+  var ids = recipes.map(function(v) {
+    return v.id;
+  }).join(',');
+
+  $.ajax({
+    url: '/recipes/get',
+    data: { ids: ids },
+    success: function(data) {
+      $('#search-results').html('');
+      for (var i = 0; i < data.length; ++i) {
+        data[i].image_url = data[i].image_url || null;
+        var html = render('search-result', data[i]);
+        $('#search-results').append(html);
+      }
+    }
+  });
+}

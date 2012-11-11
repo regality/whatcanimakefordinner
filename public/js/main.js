@@ -391,6 +391,20 @@ process.binding = function (name) {
 
 });
 
+require.define("ingredient.jade",function(require,module,exports,__dirname,__filename,process,global){module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
+attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
+var buf = [];
+with (locals || {}) {
+var interp;
+buf.push('<div class="ingredient"><h3>');
+var __val__ = name
+buf.push(escape(null == __val__ ? "" : __val__));
+buf.push('</h3></div>');
+}
+return buf.join("");
+}
+});
+
 require.define("search-result.jade",function(require,module,exports,__dirname,__filename,process,global){module.exports = function anonymous(locals, attrs, escape, rethrow, merge) {
 attrs = attrs || jade.attrs; escape = escape || jade.escape; rethrow = rethrow || jade.rethrow; merge = merge || jade.merge;
 var buf = [];
@@ -9759,45 +9773,237 @@ return jQuery;
 
 });
 
-require.define("/client/typeahead.js",function(require,module,exports,__dirname,__filename,process,global){require('./bootstrap.js');
+require.define("/client/render.js",function(require,module,exports,__dirname,__filename,process,global){"use strict";
 
-$("input#search").typeahead({
-  source: searchIngredient,
-  items: 10,
-  minLength: 1,
-  matcher: function() {
-    return true;
-  },
-  highlighter: function(item) {
-    return item.name;
-  },
-  sorter: function(items) {
-    return items;
-  },
-  updater: function(item) {
-    item = JSON.parse(item);
-    $("#ingredient-list").append(item.name + '<br/>')
-    return '';
-  }
+var browserijade = require('browserijade')
+  , $            = require('jquery')
+  ;
+
+$.fn.render = function(view, locals) {
+  return this.each(function() {
+    var _locals = locals;
+    if (typeof locals === 'function') {
+      _locals = locals.call(this);
+    }
+    var html = render(view, _locals);
+    $(this).html(html);
+  });
+};
+
+function render(view, locals) {
+  var html = browserijade(view, locals);
+  return html;
+}
+
+module.exports = render;
+
 });
 
-function searchIngredient(query, cb) {
-  $.ajax({
-    url: '/search/ingredient',
-    data: {
-      q: query
-    },
-    success: function(data) {
-      //var results = data.results.map(function(v) { return v.name; });
-      for (var i = 0; i < data.results.length; ++i) {
-        data.results[i].toString = function() {
-          return JSON.stringify(this);
-        }
-      }
-      cb(data.results);
-    }
-  });
+require.define("/node_modules/browserijade/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {"main":"./lib/middleware","browserify":"./lib/browserijade"}
+});
+
+require.define("/node_modules/browserijade/lib/browserijade.js",function(require,module,exports,__dirname,__filename,process,global){// Browserijade
+// (c) 2011 David Ed Mellum
+// Browserijade may be freely distributed under the MIT license.
+
+jade = require('jade/lib/runtime');
+
+// Render a jade file from an included folder in the Browserify
+// bundle by a path local to the included templates folder.
+var renderFile = function(path, locals) {
+	locals = locals || {};
+	path = path + '.jade';
+	template = require(path);
+	return template(locals);
 }
+
+// Render a pre-compiled Jade template in a self-executing closure.
+var renderString = function(template) {
+	return eval(template);
+}
+
+module.exports = renderFile;
+module.exports.renderString = renderString;
+});
+
+require.define("/node_modules/jade/lib/runtime.js",function(require,module,exports,__dirname,__filename,process,global){
+/*!
+ * Jade - runtime
+ * Copyright(c) 2010 TJ Holowaychuk <tj@vision-media.ca>
+ * MIT Licensed
+ */
+
+/**
+ * Lame Array.isArray() polyfill for now.
+ */
+
+if (!Array.isArray) {
+  Array.isArray = function(arr){
+    return '[object Array]' == Object.prototype.toString.call(arr);
+  };
+}
+
+/**
+ * Lame Object.keys() polyfill for now.
+ */
+
+if (!Object.keys) {
+  Object.keys = function(obj){
+    var arr = [];
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        arr.push(key);
+      }
+    }
+    return arr;
+  }
+}
+
+/**
+ * Merge two attribute objects giving precedence
+ * to values in object `b`. Classes are special-cased
+ * allowing for arrays and merging/joining appropriately
+ * resulting in a string.
+ *
+ * @param {Object} a
+ * @param {Object} b
+ * @return {Object} a
+ * @api private
+ */
+
+exports.merge = function merge(a, b) {
+  var ac = a['class'];
+  var bc = b['class'];
+
+  if (ac || bc) {
+    ac = ac || [];
+    bc = bc || [];
+    if (!Array.isArray(ac)) ac = [ac];
+    if (!Array.isArray(bc)) bc = [bc];
+    ac = ac.filter(nulls);
+    bc = bc.filter(nulls);
+    a['class'] = ac.concat(bc).join(' ');
+  }
+
+  for (var key in b) {
+    if (key != 'class') {
+      a[key] = b[key];
+    }
+  }
+
+  return a;
+};
+
+/**
+ * Filter null `val`s.
+ *
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api private
+ */
+
+function nulls(val) {
+  return val != null;
+}
+
+/**
+ * Render the given attributes object.
+ *
+ * @param {Object} obj
+ * @param {Object} escaped
+ * @return {String}
+ * @api private
+ */
+
+exports.attrs = function attrs(obj, escaped){
+  var buf = []
+    , terse = obj.terse;
+
+  delete obj.terse;
+  var keys = Object.keys(obj)
+    , len = keys.length;
+
+  if (len) {
+    buf.push('');
+    for (var i = 0; i < len; ++i) {
+      var key = keys[i]
+        , val = obj[key];
+
+      if ('boolean' == typeof val || null == val) {
+        if (val) {
+          terse
+            ? buf.push(key)
+            : buf.push(key + '="' + key + '"');
+        }
+      } else if (0 == key.indexOf('data') && 'string' != typeof val) {
+        buf.push(key + "='" + JSON.stringify(val) + "'");
+      } else if ('class' == key && Array.isArray(val)) {
+        buf.push(key + '="' + exports.escape(val.join(' ')) + '"');
+      } else if (escaped && escaped[key]) {
+        buf.push(key + '="' + exports.escape(val) + '"');
+      } else {
+        buf.push(key + '="' + val + '"');
+      }
+    }
+  }
+
+  return buf.join(' ');
+};
+
+/**
+ * Escape the given string of `html`.
+ *
+ * @param {String} html
+ * @return {String}
+ * @api private
+ */
+
+exports.escape = function escape(html){
+  return String(html)
+    .replace(/&(?!(\w+|\#\d+);)/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+};
+
+/**
+ * Re-throw the given `err` in context to the
+ * the jade in `filename` at the given `lineno`.
+ *
+ * @param {Error} err
+ * @param {String} filename
+ * @param {String} lineno
+ * @api private
+ */
+
+exports.rethrow = function rethrow(err, filename, lineno){
+  if (!filename) throw err;
+
+  var context = 3
+    , str = require('fs').readFileSync(filename, 'utf8')
+    , lines = str.split('\n')
+    , start = Math.max(lineno - context, 0)
+    , end = Math.min(lines.length, lineno + context);
+
+  // Error context
+  var context = lines.slice(start, end).map(function(line, i){
+    var curr = i + start + 1;
+    return (curr == lineno ? '  > ' : '    ')
+      + curr
+      + '| '
+      + line;
+  }).join('\n');
+
+  // Alter exception message
+  err.path = filename;
+  err.message = (filename || 'Jade') + ':' + lineno
+    + '\n' + context + '\n\n' + err.message;
+  throw err;
+};
+
+});
+
+require.define("fs",function(require,module,exports,__dirname,__filename,process,global){// nothing to see here... no file methods for the browser
 
 });
 
@@ -11828,6 +12034,294 @@ require.define("/client/bootstrap.js",function(require,module,exports,__dirname,
 }(window.jQuery);
 });
 
+require.define("events",function(require,module,exports,__dirname,__filename,process,global){if (!process.EventEmitter) process.EventEmitter = function () {};
+
+var EventEmitter = exports.EventEmitter = process.EventEmitter;
+var isArray = typeof Array.isArray === 'function'
+    ? Array.isArray
+    : function (xs) {
+        return Object.prototype.toString.call(xs) === '[object Array]'
+    }
+;
+
+// By default EventEmitters will print a warning if more than
+// 10 listeners are added to it. This is a useful default which
+// helps finding memory leaks.
+//
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+var defaultMaxListeners = 10;
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!this._events) this._events = {};
+  this._events.maxListeners = n;
+};
+
+
+EventEmitter.prototype.emit = function(type) {
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events || !this._events.error ||
+        (isArray(this._events.error) && !this._events.error.length))
+    {
+      if (arguments[1] instanceof Error) {
+        throw arguments[1]; // Unhandled 'error' event
+      } else {
+        throw new Error("Uncaught, unspecified 'error' event.");
+      }
+      return false;
+    }
+  }
+
+  if (!this._events) return false;
+  var handler = this._events[type];
+  if (!handler) return false;
+
+  if (typeof handler == 'function') {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        var args = Array.prototype.slice.call(arguments, 1);
+        handler.apply(this, args);
+    }
+    return true;
+
+  } else if (isArray(handler)) {
+    var args = Array.prototype.slice.call(arguments, 1);
+
+    var listeners = handler.slice();
+    for (var i = 0, l = listeners.length; i < l; i++) {
+      listeners[i].apply(this, args);
+    }
+    return true;
+
+  } else {
+    return false;
+  }
+};
+
+// EventEmitter is defined in src/node_events.cc
+// EventEmitter.prototype.emit() is also defined there.
+EventEmitter.prototype.addListener = function(type, listener) {
+  if ('function' !== typeof listener) {
+    throw new Error('addListener only takes instances of Function');
+  }
+
+  if (!this._events) this._events = {};
+
+  // To avoid recursion in the case that type == "newListeners"! Before
+  // adding it to the listeners, first emit "newListeners".
+  this.emit('newListener', type, listener);
+
+  if (!this._events[type]) {
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  } else if (isArray(this._events[type])) {
+
+    // Check for listener leak
+    if (!this._events[type].warned) {
+      var m;
+      if (this._events.maxListeners !== undefined) {
+        m = this._events.maxListeners;
+      } else {
+        m = defaultMaxListeners;
+      }
+
+      if (m && m > 0 && this._events[type].length > m) {
+        this._events[type].warned = true;
+        console.error('(node) warning: possible EventEmitter memory ' +
+                      'leak detected. %d listeners added. ' +
+                      'Use emitter.setMaxListeners() to increase limit.',
+                      this._events[type].length);
+        console.trace();
+      }
+    }
+
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  } else {
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  var self = this;
+  self.on(type, function g() {
+    self.removeListener(type, g);
+    listener.apply(this, arguments);
+  });
+
+  return this;
+};
+
+EventEmitter.prototype.removeListener = function(type, listener) {
+  if ('function' !== typeof listener) {
+    throw new Error('removeListener only takes instances of Function');
+  }
+
+  // does not use listeners(), so no side effect of creating _events[type]
+  if (!this._events || !this._events[type]) return this;
+
+  var list = this._events[type];
+
+  if (isArray(list)) {
+    var i = list.indexOf(listener);
+    if (i < 0) return this;
+    list.splice(i, 1);
+    if (list.length == 0)
+      delete this._events[type];
+  } else if (this._events[type] === listener) {
+    delete this._events[type];
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  // does not use listeners(), so no side effect of creating _events[type]
+  if (type && this._events && this._events[type]) this._events[type] = null;
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  if (!this._events) this._events = {};
+  if (!this._events[type]) this._events[type] = [];
+  if (!isArray(this._events[type])) {
+    this._events[type] = [this._events[type]];
+  }
+  return this._events[type];
+};
+
+});
+
+require.define("/client/typeahead.js",function(require,module,exports,__dirname,__filename,process,global){"use strict";
+
+var events       = require('events')
+  , render       = require('./render')
+  , bill         = require('./bootstrap.js')
+  , EventEmitter = events.EventEmitter
+  , ingredients  = new EventEmitter()
+  ;
+
+ingredients.ingredients = {};
+ingredients.used = {};
+
+$("input#search").typeahead({
+  source: searchIngredient,
+  items: 20,
+  minLength: 1,
+  matcher: function() {
+    return true;
+  },
+  highlighter: function(item) {
+    return item;
+  },
+  sorter: function(items) {
+    return items;
+  },
+  updater: function(item) {
+    var html = render('ingredient', {
+      name: item
+    });
+    $("#ingredient-list").append(html);
+    ingredients.used[item] = ingredients.ingredients[item]
+    ingredients.emit('new');
+    return '';
+  }
+});
+
+function searchIngredient(query, cb) {
+  $.ajax({
+    url: '/search/ingredient',
+    data: { q: query },
+    success: onSuccess
+  });
+
+  function onSuccess(data) {
+    var names = data.results.map(function(v) {
+      ingredients.ingredients[v.name] = v;
+      return v.name;
+    });
+    cb(names);
+  }
+
+}
+
+module.exports = ingredients;
+
+});
+
+require.define("/client/search.js",function(require,module,exports,__dirname,__filename,process,global){"use strict";
+
+var $           = require('jquery-browserify')
+  , render      = require('./render')
+  , ingredients = require('./typeahead')
+  ;
+
+ingredients.on('new', function() {
+  var recipesArr = []
+    , recipes = {};
+  for (var i in ingredients.used) {
+    recipesArr = recipesArr.concat(ingredients.used[i].recipes);
+  }
+  recipesArr.sort();
+  for (var i = 0; i < recipesArr.length; ++i) {
+    var id = recipesArr[i];
+    if (recipes[id]) {
+      recipes[id] = recipes[id] + 1;
+    } else {
+      recipes[id] = 1;
+    }
+  }
+  var ordered = [];
+  for (var id in recipes) {
+    ordered.push({
+      id: id,
+      count: recipes[id]
+    });
+  }
+  ordered.sort(function(a, b) {
+    return b.count - a.count;
+  });
+  var topRecipes = ordered.slice(0, 20);
+  loadRecipes(topRecipes);
+});
+
+function loadRecipes(recipes) {
+  var ids = recipes.map(function(v) {
+    return v.id;
+  }).join(',');
+
+  $.ajax({
+    url: '/recipes/get',
+    data: { ids: ids },
+    success: function(data) {
+      $('#search-results').html('');
+      for (var i = 0; i < data.length; ++i) {
+        data[i].image_url = data[i].image_url || null;
+        var html = render('search-result', data[i]);
+        $('#search-results').append(html);
+      }
+    }
+  });
+}
+
+});
+
 require.alias("jquery-browserify", "/node_modules/jquery");
 
 require.define("/client/main.js",function(require,module,exports,__dirname,__filename,process,global){var $ = require('jquery-browserify');
@@ -11837,8 +12331,8 @@ window.jQuery = $;
 window.$ = $;
 
 $(function() {
-  //require('./search');
   require('./typeahead');
+  require('./search');
 });
 
 });

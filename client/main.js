@@ -5,6 +5,6 @@ window.jQuery = $;
 window.$ = $;
 
 $(function() {
-  //require('./search');
   require('./typeahead');
+  require('./search');
 });

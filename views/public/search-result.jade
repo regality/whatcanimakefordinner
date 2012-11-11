@@ -1,5 +1,5 @@
 .result
-  a(href="/details/" + _id)
+  a(class="#{_id}", href="/details/" + _id)
     .row
       .span4
         .name= name
@@ -9,3 +9,23 @@
           img(src=image_url)
         else
           img(src="/img/default-food.gif")
+
+script
+  var $ = this.$;
+  var _id = ".#{_id}";
+  var name = !{JSON.stringify(name)};
+  var htmlIngredients = '<ul>'
+
+  var ingredients = !{JSON.stringify(ingredients)};
+  for(var i = 0; i < ingredients.length; i++) {
+    var tmp = '<li>' + ingredients[i].description + '</li>';
+    htmlIngredients = htmlIngredients.concat(tmp);
+  }
+  htmlIngredients = htmlIngredients.concat('</ul>');
+  $(_id).popover({
+    html: true,
+    placement: 'left',
+    trigger: 'hover',
+    title: name,
+    content: htmlIngredients
+  });

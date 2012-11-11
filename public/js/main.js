@@ -411,14 +411,14 @@ var buf = [];
 with (locals || {}) {
 var interp;
 buf.push('<div class="result"><a');
-buf.push(attrs({ 'href':("/details/" + _id), "class": ("" + (_id) + "") }, {"class":true,"href":true}));
-buf.push('><div class="row"><div class="span4"><div class="name">');
+buf.push(attrs({ 'href':("/details/" + _id), 'target':("_BLANK"), "class": ("" + (_id) + "") }, {"class":true,"href":true,"target":true}));
+buf.push('><div class="row"><div class="span4"><h4 class="name">');
 var __val__ = name
 buf.push(escape(null == __val__ ? "" : __val__));
-buf.push('</div><div class="description">');
+buf.push('</h4><div class="description">');
 var __val__ = description
 buf.push(escape(null == __val__ ? "" : __val__));
-buf.push('</div></div><div class="span2">');
+buf.push('</div></div><div class="span2"><div class="image-clip">');
 if ( image_url)
 {
 buf.push('<img');
@@ -429,7 +429,7 @@ else
 {
 buf.push('<img src="/img/default-food.gif"/>');
 }
-buf.push('</div></div></a></div><script>var popover = require(\'/client/popover\');\n\npopover(\'' + escape((interp = _id) == null ? '' : interp) + '\',\'' + escape((interp = name) == null ? '' : interp) + '\', ' + ((interp = JSON.stringify(ingredients)) == null ? '' : interp) + ');</script>');
+buf.push('</div></div></div></a></div><script>var popover = require(\'/client/popover\');\npopover(\'' + escape((interp = _id) == null ? '' : interp) + '\',\'' + escape((interp = name) == null ? '' : interp) + '\', ' + ((interp = JSON.stringify(ingredients)) == null ? '' : interp) + ');</script>');
 }
 return buf.join("");
 }
@@ -9785,6 +9785,8 @@ var events       = require('events')
 ingredients.ingredients = {};
 ingredients.used = {};
 
+$("input#search").focus();
+
 $("input#search").typeahead({
   source: searchIngredient,
   items: 20,
@@ -12270,9 +12272,6 @@ require.define("/client/search.js",function(require,module,exports,__dirname,__f
 var $             = require('jquery-browserify')
   , render        = require('./render')
   , ingredients   = require('./typeahead')
-  , events        = require('events')
-  , EventEmitter  = events.EventEmitter
-  , searchResults = new EventEmitter()
   ;
 
 ingredients.on('new', function() {
@@ -12318,13 +12317,10 @@ function loadRecipes(recipes) {
         data[i].image_url = data[i].image_url || null;
         var html = render('search-result', data[i]);
         $('#search-results').append(html);
-        searchResults.emit('new', html);
       }
     }
   });
 }
-
-module.exports = searchResults;
 
 });
 
@@ -12334,6 +12330,7 @@ require.define("/client/popover.js",function(require,module,exports,__dirname,__
   var $ = this.$;
   var _id = "." + id;
   var htmlIngredients = '<ul>'
+  name = '<h4>' + name + '</h4>';
 
   for(key in listedIngredientsObj.used) {
     listedIngredients.push(key);

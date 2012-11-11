@@ -10,6 +10,8 @@ var events       = require('events')
 ingredients.ingredients = {};
 ingredients.used = {};
 
+$("input#search").focus();
+
 $("input#search").typeahead({
   source: searchIngredient,
   items: 20,

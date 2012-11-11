@@ -4,6 +4,7 @@ function popover(id, name, ingredients) {
   var $ = this.$;
   var _id = "." + id;
   var htmlIngredients = '<ul>'
+  name = '<h4>' + name + '</h4>';
 
   for(key in listedIngredientsObj.used) {
     listedIngredients.push(key);

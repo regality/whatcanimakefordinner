@@ -8,32 +8,25 @@ var $       = require('jquery-browserify')
   ;
 
 $('input#search').on('keyup', function(e) {
+  if(e.keyCode != 13) return;
   var $results = $("#search-results");
   var $this = $(this);
-  var val = $this.val();
-  if (!val) return;
-  if (val === lastval) return;
-  if (timer) {
-    clearTimeout(timer);
-    timer = null;
-  }
-  lastval = val;
-  var c = ++counter;
-  timer = setTimeout(makeRequest, 300);
+
+  setTimeout(makeRequest, 20);
 
   function makeRequest() {
-    timer = null;
+    var ingredients = $("#ingredient-list").html().toString().split('<br>');
+    ingredients.pop();
     $.ajax({
-      url: '/search',
+      url: '/search/recipe',
       data: {
-        q: val
+        ingredients: ingredients
       },
       success: onSuccess
     });
   }
 
   function onSuccess(data) {
-    if (counter > c) return; // we are too late
     $results.html('');
     data.results.forEach(function(item) {
       var html = render('search-result', {

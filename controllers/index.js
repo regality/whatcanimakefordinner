@@ -53,7 +53,7 @@ function updateFromInput(recipe, req) {
   return recipe;
 }
 
-function searchRecipes(req, res, next) {
+function searchRecipesBAK(req, res, next) {
   Recipe.search({query: req.query.q + '*'}, function(err, results) {
     if (err) return next(err);
     var hits = results.hits.hits.map(function(v) {
@@ -66,6 +66,52 @@ function searchRecipes(req, res, next) {
       results: hits.slice(0, 50)
     });
   });
+}
+
+function searchRecipes(req, res, next) {
+  var ingredients = req.query.ingredients;
+
+  Ingredient.find({name: {$in: ingredients}})
+    .select('recipes')
+    .exec(function(err, docs) {
+      var allRecipes = [];
+      docs.forEach(function(doc) {
+        allRecipes = allRecipes.concat(doc.recipes);
+      });
+      allRecipes = sortByFrequencyAndRemoveDuplicates(allRecipes);
+      Recipe.find({_id: {$in: allRecipes}}, function(err, results) {
+        if (err) return next(err);
+        res.json({
+          count: results.length,
+          results: results.slice(0, 50)
+        });
+      });
+    });
+}
+
+function sortByFrequencyAndRemoveDuplicates(array) {
+  var frequency = {}, value;
+
+  // compute frequencies of each value
+  for(var i = 0; i < array.length; i++) {
+    value = array[i];
+
+    if(value in frequency) frequency[value]++;
+    else frequency[value] = 1;
+  }
+
+  // make array from the frequency object to de-duplicate
+  var uniques = [];
+  for(value in frequency) {
+    uniques.push(value);
+  }
+
+  // sort the uniques array in descending order by frequency
+  function compareFrequency(a, b) {
+    return frequency[b] - frequency[a];
+  }
+
+  return uniques.sort(compareFrequency);
 }
 
 function searchIngredient(req, res, next) {

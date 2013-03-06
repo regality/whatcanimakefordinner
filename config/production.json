@@ -1,6 +1,6 @@
 {
   "host": "www.whatcanimakefordinnerwiththeingredientsthatihaveinmyho.us",
   "mongoosastic": "elasticsearch.ifit-dev.com",
-  "mongo": "mongo01.ifit-dev.com/dinner",
+  "mongo": "dharma.mongohq.com:10061/hurdur",
   "log": "verbose"
 }

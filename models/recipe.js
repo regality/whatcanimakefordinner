@@ -50,4 +50,21 @@ RecipeSchema.pre('save', function(next) {
   }
 });
 
+RecipeSchema.statics.fixIngredientName = function(oldName, newName, cb) {
+  models.Recipe.find({}, function(err, docs) {
+    if (err) return cb(err);
+    cb();
+    docs.forEach(function(recipe) {
+      for (var i = 0; i < recipe.ingredients.length; ++i) {
+        if (recipe.ingredients[i].name.replace(/\(.*\)/,'').trim() === oldName) {
+          recipe.ingredients[i].name = newName;
+        }
+      }
+      recipe.save(function(err){
+        if (err) console.log(err.stack);
+      });
+    });
+  });
+}
+
 module.exports = RecipeSchema;

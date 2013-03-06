@@ -6,4 +6,7 @@ var confrodo    = require('confrodo') // one ring to rule them all
   , common      = __dirname + '/common.json'
   , config      = confrodo(packagejson, common, filename, 'ENV', 'ARGV');
 
+config.mongo = config.mongo.replace('username', config.mongousername);
+config.mongo = config.mongo.replace('password', config.mongopassword);
+console.log(config);
 module.exports = config;

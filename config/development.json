@@ -1,6 +1,5 @@
 {
   "host": "local.whatcanimakefordinnerwiththeingredientsthatihaveinmyho.us:3000",
-  "mongoosastic": "elasticsearch.ifit-dev.com",
-  "mongo": "dharma.mongohq.com:10061/hurdur",
+  "mongo": "username:password@dharma.mongohq.com:10061/hurdur",
   "log": "verbose"
 }

@@ -127,12 +127,13 @@ function fixRecipes(req, res, next) {
 function postFixRecipes(req, res, next) {
   var fixedIngredients = req.body.name;
   Recipe.findOne({_id: req.body.recipe_id}, function(err, recipe) {
-    for (var i = 0; i< fixedIngredients.length; i++) {
-      if (recipe.ingredients[i].name !== fixedIngredients[i]) {
-        Recipe.fixIngredientName(recipe.ingredients[i].name, fixedIngredients[i], function(err) {
-          if (err) console.log(err.stack);
-        });
-      }
+    for (var i = 0; i < fixedIngredients.length; i++) {
+      //if (recipe.ingredients[i].name !== fixedIngredients[i]) {
+        //Recipe.fixIngredientName(recipe.ingredients[i].name, fixedIngredients[i], function(err) {
+          //if (err) console.log(err.stack);
+        //});
+      //}
+      recipe.ingredients[i].name = fixedIngredients[i];
     }
     recipe.fixed = 'done';
     recipe.save(function() {
